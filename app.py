@@ -41,7 +41,7 @@ def incoming_sms():
         games_table = db_client.test.games
         game_info = None 
 
-        rows = games.find({})
+        rows = games_table.find({})
         for row in rows:
             if from_num in row["nums"]:
                 game_info = row 
@@ -50,7 +50,6 @@ def incoming_sms():
 
 
 
-    to_num = "+19172266242"
     twilio_num = "+17579199437"
 
     #todo: update story in database
@@ -63,7 +62,7 @@ def incoming_sms():
 
     if game_info is None:
         message = client.messages.create(
-            to = to_num, 
+            to = from_num, 
             from_= twilio_num,
             body = "You're not currently in a Story. Please contact Jake Apfel. Please.")
         return message.sid
@@ -73,14 +72,13 @@ def incoming_sms():
         game_info["index_in_nums"] = (game_info["index_in_nums"] + 1) % len(game_info["nums"])
 
         message = client.messages.create(
-            to = to_num, 
+            to = game_info["nums"][game_info["index_in_nums"]], 
             from_= twilio_num,
             body = game_info["message"])
 
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games
             games_table.update_one({"_id": game_info["_id"]}, {"$set": game_info})
-            
         return message.sid
 
 

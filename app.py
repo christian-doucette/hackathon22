@@ -114,6 +114,13 @@ def create_group():
 	            body = f"Welcome {name} to game {title}")
 
         games_table.insert_one(new_game)
+        
+        # first message
+        message = client.messages.create(
+            to = nums[0],
+            from_ = twilio_num,
+            body = "start the game"
+        )
 
     # returns confirmation message
     return render_template('create_game.html')

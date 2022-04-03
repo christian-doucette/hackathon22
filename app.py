@@ -35,5 +35,14 @@ def incoming_sms():
 	    body = story)
     return to_num, story
 
+@app.route("/create-group", methods=["POST"])
+def create_group():
+    title = request.form['title']
+    num_players = request.form['num_players']
+    names = request.form.getlist('names')
+    numbers = request.form.getlist('nums')
+    return f"{title} {num_players} {names} {numbers}"
+
 if __name__ == "__main__":
     app.run(debug=True)
+

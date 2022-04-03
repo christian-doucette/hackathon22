@@ -40,7 +40,6 @@ def incoming_sms():
     with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
         games_table = db_client.test.games
         game_info = None 
-
         rows = games_table.find({})
         for row in rows:
             if from_num in row["nums"]:
@@ -48,23 +47,16 @@ def incoming_sms():
                 break
 
 
-
-
     twilio_num = "+17579199437"
-
-    #todo: update story in database
-    #check if sent message is ###: if so the story is over. text full story to all, 
-
     account_sid = os.getenv('TWILIO_SID')
     auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
     client = Client(account_sid, auth_token)
-
 
     if game_info is None:
         message = client.messages.create(
             to = from_num, 
             from_= twilio_num,
-            body = "You're not currently in a Story. Please contact Jake Apfel. Please.")
+            body = "You're not currently in a Story. Visit https://story-time-hackathon.herokuapp.com/ to start a new Story.")
         return "400"
 
     cur_num = game_info["nums"][game_info["index_in_nums"]]
@@ -72,18 +64,25 @@ def incoming_sms():
         message = client.messages.create(
             to = from_num, 
             from_= twilio_num,
-            body = "It's not your turn!")
+            body = "It's not your turn! Wait for the Story to come to you.")
         return "400"
 
     if body.lower() == "/end" or body.lower() == "\end":
-        #game is ending. text everyone full story and remove database entry
+        #pick sign off
+        sign_off = random.choice(["Are movie rights available for that?", "What a fun story...", "I could write a better story. And I'm not even real.", "HAHAHAHA", "That made me smile.", "That made me tear up.", "Thanks for playing :)", "Better luck next time."])
+        length = len(game_info["message"])
+        if length < 10:
+            sign_off = random.choice(["Really? That's it?", sign_off])
+        elif length > 100:
+            sign_off = random.choice(["Too long; didn't read.", sign_off])
 
-        #todo: check if is players turn. can only end if is their turn
+        #game is ending. text everyone full story and remove database entry
         for to_num in game_info["nums"]:
             message = client.messages.create(
                 to = to_num, 
                 from_= twilio_num,
-                body = game_info["message"])
+                body = f"Your completed Story \"{game_info["title"]}\" is:\n\n" + game_info["message"] + "\n\n" + sign_off
+            )
 
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games
@@ -92,22 +91,18 @@ def incoming_sms():
 
     else:
         #recieved a non command message. add to the story if it is this players turn
-
-         #todo: check if is players turn. can only add message if is players
         game_info["message"] = game_info["message"] + " " + body
         game_info["index_in_nums"] = (game_info["index_in_nums"] + 1) % len(game_info["nums"])
 
         message = client.messages.create(
             to = game_info["nums"][game_info["index_in_nums"]], 
             from_= twilio_num,
-            body = game_info["message"])
+            body = f"The current Story \"{game_info["title"]}\" is:\n\n" + game_info["message"] + "\n\nReply with a word to continue it, or \"/end\" to end it.")
 
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games
             games_table.update_one({"_id": game_info["_id"]}, {"$set": game_info})
         return "200"
-
-
 
 
 @app.route("/create-group", methods=["POST"])
@@ -130,11 +125,15 @@ def create_group():
         account_sid = os.getenv('TWILIO_SID')
         auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
         client = Client(account_sid, auth_token)
-        for name,to_num in zip(names, nums):
+        for name,to_num in zip(names, nums)[1:]:
             message = client.messages.create(
 	            to = to_num, 
 	            from_= twilio_num,
-	            body = f"Welcome {name} to game {title}")
+	            body = f"{name}, welcome to Story \"{title}\"! Reply with a word once the Story comes to you.")
+        message = client.messages.create(
+            to = nums[0], 
+            from_= twilio_num,
+            body = f"{names[0]}, welcome to Story \"{title}\"! Reply with a word to begin the Story.")
 
         games_table.insert_one(new_game)
 

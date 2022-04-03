@@ -114,7 +114,7 @@ def create_group():
     nums = request.form.getlist('nums')
     # adds +1 to start of phone number and removes dashes
     nums = [f'+1{num.replace("-", "")}' for num in nums]
-    names = ', '.join([name for name in names])
+    str_names = ', '.join([name for name in names])
 
     # connects to MongoDB Atlas instance, inserts this game, then closes connection
     with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
@@ -151,7 +151,7 @@ def create_group():
         message = client.messages.create(
             to = nums[0],
             from_= twilio_num,
-            body = f"{names[0]}, welcome to story \'{title}\'! Reply with up to {max_words} words to begin the story.")
+            body = body)
 
         games_table.insert_one(new_game)
 

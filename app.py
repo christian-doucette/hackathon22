@@ -109,7 +109,7 @@ def create_group():
     nums = request.form.getlist('nums')
     # adds +1 to start of phone number and removes dashes
     nums = [f'+1{num.replace("-", "")}' for num in nums]
-
+    names = ', '.join([name for name in names])
 
     # connects to MongoDB Atlas instance, inserts this game, then closes connection
     with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
@@ -130,7 +130,7 @@ def create_group():
             message = client.messages.create(
                 to = to_num, 
                 from_= twilio_num,
-                body = f"{name}, welcome to story \'{title}\'! Reply with up to {max_words} words once the story comes to you.")
+                body = f"{name}, welcome to story \'{title}\'! Reply with up to {max_words} words once the story comes to you. You are playing with {names}")
         message = client.messages.create(
             to = nums[0], 
             from_= twilio_num,

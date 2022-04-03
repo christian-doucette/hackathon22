@@ -28,6 +28,8 @@ app = Flask(__name__)
 def hello():
     to_num = "+19172266242"
     from_num = "+17579199437"
+    account_sid = os.getenv('TWILIO_SID')
+    auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
     client = Client(account_sid, auth_token)
     client.messages.create(
         to = to_num, 

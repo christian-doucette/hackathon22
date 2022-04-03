@@ -15,6 +15,7 @@ import os
 
 account_sid = os.getenv('TWILIO_SID')
 auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
+client = Client(account_sid, auth_token)
 from_num = "+17579199437"
 
 to_nums = ["+19737229359"]

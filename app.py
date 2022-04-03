@@ -1,37 +1,22 @@
-# client = Client(account_sid, auth_token)
-
-# message = client.messages.create(
-#     to="+19737229359", 
-#     from_="+17579199437",
-#     body="Hello from Python!")
-
-# print(message.sid)
-
 from twilio.rest import Client
 from flask import Flask, request, redirect, render_template
 import random
 import os
-import pymongo
+import pymongoss
 
-
-"""
-account_sid = os.getenv('TWILIO_SID')
-auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
-client = Client(account_sid, auth_token)
-from_num = "+17579199437"
-to_nums = ["+19172266242"]
-story = "\nStory time! Reply with a word to continue the story:\n"
-"""
 
 app = Flask(__name__)
+
 
 @app.route('/', methods=['GET'])
 def hello():
     return render_template('index.html')
 
+
 @app.route('/rules', methods=['GET'])
 def rules():
     return render_template('rules.html')
+
 
 @app.route("/sms", methods=['POST'])
 def incoming_sms():
@@ -130,22 +115,15 @@ def create_group():
         client = Client(account_sid, auth_token)
         for name,to_num in zip(names, nums)[1:]:
             message = client.messages.create(
-	            to = to_num, 
-	            from_= twilio_num,
-	            body = f"{name}, welcome to Story \"{title}\"! Reply with a word once the Story comes to you.")
+                to = to_num, 
+                from_= twilio_num,
+                body = f"{name}, welcome to Story \"{title}\"! Reply with a word once the Story comes to you.")
         message = client.messages.create(
             to = nums[0], 
             from_= twilio_num,
             body = f"{names[0]}, welcome to Story \"{title}\"! Reply with a word to begin the Story.")
 
         games_table.insert_one(new_game)
-        
-        # first message
-        message = client.messages.create(
-            to = nums[0],
-            from_ = twilio_num,
-            body = "start the game"
-        )
 
     # returns confirmation message
     return render_template('create_game.html')

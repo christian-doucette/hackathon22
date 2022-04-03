@@ -46,6 +46,8 @@ def incoming_sms():
     auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
     client = Client(account_sid, auth_token)
     # Get the message the user sent our Twilio number
+    print(request.args.to_dict())
+    print(request.form.to_dict())
     body = request.values.get('Body', None)
     #story += body.split()[0] + " "
     #to_num = random.choice(to_nums)

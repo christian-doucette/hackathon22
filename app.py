@@ -21,7 +21,7 @@ def rules():
 @app.route("/sms", methods=['POST'])
 def incoming_sms():
     """Send a dynamic reply to an incoming text message"""
-    body = request.values.get('Body', None).split()[0]
+    body = request.values.get('Body', None).split()
     from_num = request.form.get('From', None)
 
     # scans database to get the row for the game involving this number
@@ -55,7 +55,15 @@ def incoming_sms():
             body = "It's not your turn! Wait for the story to come to you.")
         return "400"
 
-    if body == "*":
+    body = body[:game_info['max_words']]
+    ended = False
+    for word in body:
+        if word == "*":
+            ended = True
+            break
+        game_info["message"] += word + " "
+
+    if ended:
         #pick sign off
         sign_off = random.choice(["Are movie rights available for that?", "What a fun story...", "I could write a better story. And I'm not even real.", "HAHAHAHA", "That made me smile.", "That made me tear up.", "Thanks for playing :)", "Better luck next time."])
         length = len(game_info["message"])
@@ -78,13 +86,12 @@ def incoming_sms():
 
     else:
         #recieved a non command message. add to the story if it is this players turn
-        game_info["message"] = game_info["message"] + body + " "
         game_info["index_in_nums"] = (game_info["index_in_nums"] + 1) % len(game_info["nums"])
 
         message = client.messages.create(
             to = game_info["nums"][game_info["index_in_nums"]], 
             from_= twilio_num,
-            body = f"The current story \'{game_info['title']}\' is:\n\n" + game_info["message"] + "\n\nReply with a word to continue the story or \'*\' to end it.")
+            body = f"The current story \'{game_info['title']}\' is:\n\n" + game_info["message"] + f"\n\nReply with up to {game_info['max_words']} words to continue the story or \'*\' to end it.")
 
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games
@@ -97,6 +104,7 @@ def create_group():
     # gets data from form
     title = request.form['title']
     num_players = request.form['num_players']
+    max_words = request.form['max_words']
     names = request.form.getlist('names')
     nums = request.form.getlist('nums')
     # adds +1 to start of phone number and removes dashes
@@ -106,7 +114,7 @@ def create_group():
     # connects to MongoDB Atlas instance, inserts this game, then closes connection
     with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
         games_table = db_client.test.games
-        new_game = {"title": title, "message": "", "names": names, "nums": nums, "index_in_nums": 0}
+        new_game = {"title": title, "message": "", "names": names, "nums": nums, "index_in_nums": 0, "max_words": max_words}
 
         twilio_num = "+17579199437"
         account_sid = os.getenv('TWILIO_SID')
@@ -116,11 +124,11 @@ def create_group():
             message = client.messages.create(
                 to = to_num, 
                 from_= twilio_num,
-                body = f"{name}, welcome to story \'{title}\'! Reply with a word once the story comes to you.")
+                body = f"{name}, welcome to story \'{title}\'! Reply with up to {max_words} words once the story comes to you.")
         message = client.messages.create(
             to = nums[0], 
             from_= twilio_num,
-            body = f"{names[0]}, welcome to story \'{title}\'! Reply with a word to begin the story.")
+            body = f"{names[0]}, welcome to story \'{title}\'! Reply with up to {max_words} words to begin the story.")
 
         games_table.insert_one(new_game)
 

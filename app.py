@@ -59,9 +59,9 @@ def incoming_sms():
         #pick sign off
         sign_off = random.choice(["Are movie rights available for that?", "What a fun story...", "I could write a better story. And I'm not even real.", "HAHAHAHA", "That made me smile.", "That made me tear up.", "Thanks for playing :)", "Better luck next time."])
         length = len(game_info["message"])
-        if length < 10:
+        if length < 20:
             sign_off = random.choice(["Really? That's it?", sign_off])
-        elif length > 100:
+        elif length > 120:
             sign_off = random.choice(["Too long; didn't read.", sign_off])
 
         #game is ending. text everyone full story and remove database entry
@@ -69,7 +69,7 @@ def incoming_sms():
             message = client.messages.create(
                 to = to_num, 
                 from_= twilio_num,
-                body = f"Your completed story \'{game_info['title']}\'' is:\n\n" + game_info["message"] + "\n\n" + sign_off)
+                body = f"Your completed story \'{game_info['title']}\' is:\n\n" + game_info["message"] + "\n\n" + sign_off)
 
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games
@@ -84,7 +84,7 @@ def incoming_sms():
         message = client.messages.create(
             to = game_info["nums"][game_info["index_in_nums"]], 
             from_= twilio_num,
-            body = f"The current story \'{game_info['title']}\'' is:\n\n" + game_info["message"] + "\n\nReply with a word to continue it or \'/end\'' to end it.")
+            body = f"The current story \'{game_info['title']}\' is:\n\n" + game_info["message"] + "\n\nReply with a word to continue it or \'/end\' to end it.")
 
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games

@@ -37,7 +37,7 @@ def hello():
         body = "this is what should send initially")
     return 'Welcome to Story Time!'
 
-@app.route("/sms", methods=['GET', 'POST'])
+@app.route("/sms", methods=['POST'])
 def incoming_sms():
     """Send a dynamic reply to an incoming text message"""
     to_num = "+19172266242"
@@ -53,6 +53,7 @@ def incoming_sms():
 	    to = to_num, 
 	    from_= from_num,
 	    body = "this is what should send as a response")
+    return message.sid
 
 if __name__ == "__main__":
     app.run(debug=True)

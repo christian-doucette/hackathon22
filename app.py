@@ -58,6 +58,7 @@ def incoming_sms():
 	    to = to_num, 
 	    from_= twilio_num,
 	    body = body)
+    return message.sid
 
 if __name__ == "__main__":
     app.run(debug=True)

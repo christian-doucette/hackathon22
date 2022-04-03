@@ -24,7 +24,7 @@ story = "\nStory time! Reply with a word to continue the story:\n"
 
 app = Flask(__name__)
 
-@app.route('/', methods='GET')
+@app.route('/', methods=['GET'])
 def hello():
     to_num = "+19172266242"
     from_num = "+17579199437"

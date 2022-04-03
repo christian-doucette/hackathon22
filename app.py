@@ -13,9 +13,9 @@ def hello():
     return render_template('index.html')
 
 
-@app.route('/rules', methods=['GET'])
+@app.route('/about_us', methods=['GET'])
 def rules():
-    return render_template('rules.html')
+    return render_template('about_us.html')
 
 
 @app.route("/sms", methods=['POST'])
@@ -27,11 +27,11 @@ def incoming_sms():
     # scans database to get the row for the game involving this number
     with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
         games_table = db_client.test.games
-        game_info = None 
+        game_info = None
         rows = games_table.find({})
         for row in rows:
             if from_num in row["nums"]:
-                game_info = row 
+                game_info = row
                 break
 
 
@@ -42,7 +42,7 @@ def incoming_sms():
 
     if game_info is None:
         message = client.messages.create(
-            to = from_num, 
+            to = from_num,
             from_= twilio_num,
             body = "You're not currently in a story. Visit https://story-time-hackathon.herokuapp.com/ to start a new story.")
         return "400"
@@ -50,7 +50,7 @@ def incoming_sms():
     cur_num = game_info["nums"][game_info["index_in_nums"]]
     if cur_num != from_num:
         message = client.messages.create(
-            to = from_num, 
+            to = from_num,
             from_= twilio_num,
             body = "It's not your turn! Wait for the story to come to you.")
         return "400"
@@ -75,7 +75,7 @@ def incoming_sms():
         #game is ending. text everyone full story and remove database entry
         for to_num in game_info["nums"]:
             message = client.messages.create(
-                to = to_num, 
+                to = to_num,
                 from_= twilio_num,
                 body = f"Your completed story \'{game_info['title']}\' is:\n\n" + game_info["message"] + "\n\n" + sign_off)
 
@@ -89,7 +89,7 @@ def incoming_sms():
         game_info["index_in_nums"] = (game_info["index_in_nums"] + 1) % len(game_info["nums"])
 
         message = client.messages.create(
-            to = game_info["nums"][game_info["index_in_nums"]], 
+            to = game_info["nums"][game_info["index_in_nums"]],
             from_= twilio_num,
             body = f"The current story \'{game_info['title']}\' is:\n\n" + game_info["message"] + f"\n\nReply with up to {game_info['max_words']} words to continue the story or \'*\' to end it.")
 
@@ -128,11 +128,11 @@ def create_group():
         client = Client(account_sid, auth_token)
         for name,to_num in list(zip(names, nums))[1:]:
             message = client.messages.create(
-                to = to_num, 
+                to = to_num,
                 from_= twilio_num,
                 body = f"{name}, welcome to story \'{title}\'! Reply with up to {max_words} words once the story comes to you.")
         message = client.messages.create(
-            to = nums[0], 
+            to = nums[0],
             from_= twilio_num,
             body = f"{names[0]}, welcome to story \'{title}\'! Reply with up to {max_words} words to begin the story.")
 

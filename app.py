@@ -8,7 +8,7 @@
 # print(message.sid)
 
 from twilio.rest import Client
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, render_template
 # from twilio.twiml.messaging_response import MessagingResponse
 import random
 import os

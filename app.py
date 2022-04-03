@@ -75,7 +75,7 @@ def incoming_sms():
             body = "It's not your turn!")
         return "400"
 
-    if body == "END":
+    if body.lower() == "/end" or body.lower() == "\end":
         #game is ending. text everyone full story and remove database entry
 
         #todo: check if is players turn. can only end if is their turn

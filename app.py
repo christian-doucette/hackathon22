@@ -141,12 +141,12 @@ def create_group():
         auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
         client = Client(account_sid, auth_token)
 
-        if max_words == 1:        
-            body = f"{name}, welcome to story \'{title}\'! The authors are {name_list_to_string(names)}. Reply with a word once the story comes to you."
-        else:    
-            body = f"{name}, welcome to story \'{title}\'! The authors are {name_list_to_string(names)}. Reply with up to {max_words} words once the story comes to you."
-
         for name,to_num in list(zip(names, nums))[1:]:
+            if max_words == 1:        
+                body = f"{name}, welcome to story \'{title}\'! The authors are {name_list_to_string(names)}. Reply with a word once the story comes to you."
+            else:    
+                body = f"{name}, welcome to story \'{title}\'! The authors are {name_list_to_string(names)}. Reply with up to {max_words} words once the story comes to you."
+
             message = client.messages.create(
                 to = to_num,
                 from_= twilio_num,

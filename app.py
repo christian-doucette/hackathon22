@@ -22,6 +22,10 @@ story = "\nStory time! Reply with a word to continue the story:\n"
 
 app = Flask(__name__)
 
+@app.route("/")
+def hello_world():
+    return render_template('index.html')
+
 @app.route("/sms", methods=['GET', 'POST'])
 def incoming_sms():
     """Send a dynamic reply to an incoming text message"""

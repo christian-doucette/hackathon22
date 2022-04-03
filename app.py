@@ -26,36 +26,38 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def hello():
+    """loads the page where users can start a game"""
+    twilio_num = "+17579199437"
     to_num = "+19172266242"
-    from_num = "+17579199437"
+
     account_sid = os.getenv('TWILIO_SID')
     auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
     client = Client(account_sid, auth_token)
     client.messages.create(
         to = to_num, 
-        from_= from_num,
+        from_= twilio_num,
         body = "this is what should send initially")
     return 'Welcome to Story Time!'
 
 @app.route("/sms", methods=['POST'])
 def incoming_sms():
     """Send a dynamic reply to an incoming text message"""
+    body = request.values.get('Body', None)
+    from_num = request.form.get('From', None)
+
+    #todo: read database to get to_num instead of always sending to jake
     to_num = "+19172266242"
-    from_num = "+17579199437"
+    twilio_num = "+17579199437"
+
     account_sid = os.getenv('TWILIO_SID')
     auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
     client = Client(account_sid, auth_token)
-    # Get the message the user sent our Twilio number
-    print(request.args.to_dict())
-    print(request.form.to_dict())
     body = request.values.get('Body', None)
-    #story += body.split()[0] + " "
-    #to_num = random.choice(to_nums)
+
     message = client.messages.create(
 	    to = to_num, 
-	    from_= from_num,
-	    body = "this is what should send as a response")
-    return message.sid
+	    from_= twilio_num,
+	    body = body)
 
 if __name__ == "__main__":
     app.run(debug=True)

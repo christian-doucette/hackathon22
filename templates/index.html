@@ -31,7 +31,7 @@
                 num.remove()
             })
 
-            for (let i = 0; i < num && i < 20; i++){
+            for (let i = 0; i < num; i++){
                 newname = document.createElement("input")
                 newnum = document.createElement("input")
                 newbr = document.createElement("br")
@@ -55,7 +55,7 @@
             }
             numwords = document.createElement("input")
             numwords.type= "number"
-            numwords.max="5"
+            numwords.min="1"
             numwords.name="max_words"
             numwords.className="number"
             numwords.placeholder = "words per turn"
@@ -93,10 +93,10 @@
     <form id="form" action="create-group" method="POST" autocomplete="off">
         <label>Title</label>
         <input type="text" name = "title" required="true"><br>
-        <input type="checkbox" name = "prompt">
-        <label>Start with a random prompt</label><br>
+        <!--<input type="checkbox" name = "prompt">
+        <label>Start with a random prompt</label><br> -->
         <label>Number of players</label>
-        <input id="num_players" name = "num_players" type="number" max="20" onchange="set_fields()"><br>
+        <input id="num_players" name = "num_players" type="number" min="1" onchange="set_fields()"><br>
 
 
     </form>

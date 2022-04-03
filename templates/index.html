@@ -45,7 +45,7 @@
                 newnum.require="true"
                 newname.name="names"
                 newnum.name="nums"
-
+                newname.autocomplete="off"
                 newname.placeholder="Name"
                 newnum.placeholder="123-456-7890"
                 newnum.addEventListener('keyup', format_num)
@@ -53,6 +53,18 @@
                 form.append(newnum)
                 form.append(newbr)
             }
+            numwords = document.createElement("input")
+            numwords.type= "number"
+            numwords.max="5"
+            numwords.name="max_words"
+            numwords.className="number"
+            numwords.placeholder = "words per turn"
+
+            br = document.createElement("br")
+            br.className = "numbers"
+            form.append(br)
+
+            form.append(numwords)
             submit = document.createElement("input")
             submit.type="submit"
             submit.className="number"
@@ -81,8 +93,10 @@
     <form id="form" action="create-group" method="POST" autocomplete="off">
         <label>Title</label>
         <input type="text" name = "title" required="true"><br>
+        <input type="checkbox" name = "prompt" required = "true">
+        <label>Start with a random prompt</label><br>
         <label>Number of players</label>
-        <input id="num_players" name = "num_players" type="number" onchange="set_fields()"><br>
+        <input id="num_players" name = "num_players" type="number" max="20" onchange="set_fields()"><br>
 
 
     </form>

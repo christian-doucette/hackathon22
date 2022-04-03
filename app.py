@@ -29,6 +29,9 @@ app = Flask(__name__)
 def hello():
     return render_template('index.html')
 
+@app.route('/rules', methods=['GET'])
+def rules():
+    return render_template('rules.html')
 
 @app.route("/sms", methods=['POST'])
 def incoming_sms():
@@ -137,9 +140,16 @@ def create_group():
 	            body = f"Welcome {name} to game {title}")
 
         games_table.insert_one(new_game)
+        
+        # first message
+        message = client.messages.create(
+            to = nums[0],
+            from_ = twilio_num,
+            body = "start the game"
+        )
 
     # returns confirmation message
-    return f"Game created successfully!"
+    return render_template('create_game.html')
 
 
 if __name__ == "__main__":

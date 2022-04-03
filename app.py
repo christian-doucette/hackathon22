@@ -34,7 +34,7 @@ def hello():
         body = "this is what should send initially")
     return 'Welcome to Story Time!'
 
-@app.route("/sms", methods='POST')
+@app.route("/sms", methods=['POST'])
 def incoming_sms():
     to_num = "+19172266242"
     from_num = "+17579199437"

@@ -44,7 +44,7 @@ def incoming_sms():
         message = client.messages.create(
             to = from_num, 
             from_= twilio_num,
-            body = "You're not currently in a Story. Visit https://story-time-hackathon.herokuapp.com/ to start a new Story.")
+            body = "You're not currently in a story. Visit https://story-time-hackathon.herokuapp.com/ to start a new story.")
         return "400"
 
     cur_num = game_info["nums"][game_info["index_in_nums"]]
@@ -52,7 +52,7 @@ def incoming_sms():
         message = client.messages.create(
             to = from_num, 
             from_= twilio_num,
-            body = "It's not your turn! Wait for the Story to come to you.")
+            body = "It's not your turn! Wait for the story to come to you.")
         return "400"
 
     if body.lower() == "/end" or body.lower() == "\end":
@@ -69,7 +69,7 @@ def incoming_sms():
             message = client.messages.create(
                 to = to_num, 
                 from_= twilio_num,
-                body = f"Your completed Story \"{game_info['title']}\" is:\n\n" + game_info["message"] + "\n\n" + sign_off)
+                body = f"Your completed story \'{game_info['title']}\'' is:\n\n" + game_info["message"] + "\n\n" + sign_off)
 
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games
@@ -78,13 +78,13 @@ def incoming_sms():
 
     else:
         #recieved a non command message. add to the story if it is this players turn
-        game_info["message"] = game_info["message"] + " " + body
+        game_info["message"] = game_info["message"] + body + " "
         game_info["index_in_nums"] = (game_info["index_in_nums"] + 1) % len(game_info["nums"])
 
         message = client.messages.create(
             to = game_info["nums"][game_info["index_in_nums"]], 
             from_= twilio_num,
-            body = f"The current Story \"{game_info['title']}\" is:\n\n" + game_info["message"] + "\n\nReply with a word to continue it, or \"/end\" to end it.")
+            body = f"The current story \'{game_info['title']}\'' is:\n\n" + game_info["message"] + "\n\nReply with a word to continue it or \'/end\'' to end it.")
 
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games
@@ -116,11 +116,11 @@ def create_group():
             message = client.messages.create(
                 to = to_num, 
                 from_= twilio_num,
-                body = f"{name}, welcome to Story \"{title}\"! Reply with a word once the Story comes to you.")
+                body = f"{name}, welcome to story \'{title}\'! Reply with a word once the story comes to you.")
         message = client.messages.create(
             to = nums[0], 
             from_= twilio_num,
-            body = f"{names[0]}, welcome to Story \"{title}\"! Reply with a word to begin the Story.")
+            body = f"{names[0]}, welcome to story \'{title}\'! Reply with a word to begin the story.")
 
         games_table.insert_one(new_game)
 

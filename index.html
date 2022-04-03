@@ -1,1 +1,50 @@
-Test, this should display on the site homepage
+<head>
+    <script>
+        function set_fields(){
+            num = document.getElementById("num_players").value
+            form = document.getElementById("form")
+            nums = document.querySelectorAll(".number")
+            nums.forEach(num => {
+                num.remove()
+            })
+
+            for (let i = 0; i < num && i < 20; i++){
+                newname = document.createElement("input")
+                newnum = document.createElement("input")
+                newbr = document.createElement("br")
+                newname.type="text"
+                newnum.type="tel"
+                newnum.pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                newname.className = "number"
+                newnum.className="number"
+                newbr.className="number"
+                newname.required="true"
+                newnum.require="true"
+
+                newname.placeholder="Name"
+                newnum.placeholder="123-456-7890"
+                
+                form.append(newname)
+                form.append(newnum)
+                form.append(newbr)
+            }
+            submit = document.createElement("input")
+            submit.type="submit"
+            submit.className="number"
+            form.append(submit)
+        }
+    </script>
+</head>
+<body>
+    <h4>Welcome to StoryTime Hackathon</h4>
+    <p>To start a new group do this stuff</p>
+    <form id="form">
+        <label>Title</label>
+        <input type="text" required="true"><br>
+        <label>Number of players</label>
+        <input id="num_players" type="number" onchange="set_fields()"><br>
+
+
+    </form>
+
+</body>

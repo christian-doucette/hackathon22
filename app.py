@@ -37,11 +37,14 @@ def hello():
         body = "this is what should send initially")
     return 'Welcome to Story Time!'
 
-@app.route("/sms", methods=['POST'])
+@app.route("/sms", methods=['GET', 'POST'])
 def incoming_sms():
+    """Send a dynamic reply to an incoming text message"""
     to_num = "+19172266242"
     from_num = "+17579199437"
-    """Send a dynamic reply to an incoming text message"""
+    account_sid = os.getenv('TWILIO_SID')
+    auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
+    client = Client(account_sid, auth_token)
     # Get the message the user sent our Twilio number
     body = request.values.get('Body', None)
     #story += body.split()[0] + " "

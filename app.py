@@ -114,8 +114,14 @@ def create_group():
     # connects to MongoDB Atlas instance, inserts this game, then closes connection
     with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
         games_table = db_client.test.games
-        new_game = {"title": title, "message": "", "names": names, "nums": nums, "index_in_nums": 0, "max_words": max_words}
 
+        # checking if any player is already in a story. if so, story creation fails
+        rows = games_table.find({})
+        for row in rows:
+            if len(set(row["nums"]) & set(nums)) > 0:
+                return render_template("create_game_fail.html")
+
+        new_game = {"title": title, "message": "", "names": names, "nums": nums, "index_in_nums": 0, "max_words": max_words}
         twilio_num = "+17579199437"
         account_sid = os.getenv('TWILIO_SID')
         auth_token  = os.getenv('TWILIO_AUTH_TOKEN')

@@ -27,19 +27,6 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def hello():
-    """loads the page where users can start a game"""
-    """
-    twilio_num = "+17579199437"
-    to_num = "+19172266242"
-
-    account_sid = os.getenv('TWILIO_SID')
-    auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
-    client = Client(account_sid, auth_token)
-    client.messages.create(
-        to = to_num, 
-        from_= twilio_num,
-        body = "this is what should send initially")
-    """
     return render_template('index.html')
 
 

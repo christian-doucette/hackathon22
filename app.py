@@ -1,17 +1,18 @@
 # client = Client(account_sid, auth_token)
 
 # message = client.messages.create(
-#     to="+19737229359", 
+#     to="+19737229359",
 #     from_="+17579199437",
 #     body="Hello from Python!")
 
 # print(message.sid)
 
 from twilio.rest import Client
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, render_template
 # from twilio.twiml.messaging_response import MessagingResponse
 import random
 import os
+import pymongo
 
 account_sid = os.getenv('TWILIO_SID')
 auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
@@ -34,19 +35,30 @@ def incoming_sms():
     story += body.split()[0] + " "
     to_num = random.choice(to_nums)
     story = client.messages.create(
-	    to = to_num, 
+	    to = to_num,
 	    from_= "+17579199437",
 	    body = story)
     return to_num, story
 
 @app.route("/create-group", methods=["POST"])
 def create_group():
+    # gets data from form
     title = request.form['title']
     num_players = request.form['num_players']
     names = request.form.getlist('names')
-    numbers = request.form.getlist('nums')
-    return f"{title} {num_players} {names} {numbers}"
+    nums = request.form.getlist('nums')
+
+
+    # connects to MongoDB Atlas instance, inserts this game, then closes connection
+    with pymongo.MongoClient(os.getenv('DB_CLIENT_STRING')) as client:
+        games_table = client.test.games
+        new_game = {"title": title, "message": "", "names": names, "nums": nums, "index_in_nums": 0}
+        games_table.insert_one(new_game)
+
+    # returns confirmation message
+    return f"Game created successfully!"
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
-

@@ -88,10 +88,15 @@ def incoming_sms():
         #recieved a non command message. add to the story if it is this players turn
         game_info["index_in_nums"] = (game_info["index_in_nums"] + 1) % len(game_info["nums"])
 
+        if game_info['max_words'] == 1:
+            body = f"The current story \'{game_info['title']}\' is:\n\n" + game_info["message"] + f"\n\nReply with a word to continue the story or \'*\' to end it."
+        else:
+            body = f"The current story \'{game_info['title']}\' is:\n\n" + game_info["message"] + f"\n\nReply with up to {game_info['max_words']} words to continue the story or \'*\' to end it."
+
         message = client.messages.create(
             to = game_info["nums"][game_info["index_in_nums"]],
             from_= twilio_num,
-            body = f"The current story \'{game_info['title']}\' is:\n\n" + game_info["message"] + f"\n\nReply with up to {game_info['max_words']} words to continue the story or \'*\' to end it.")
+            body = body)
 
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games
@@ -126,11 +131,23 @@ def create_group():
         account_sid = os.getenv('TWILIO_SID')
         auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
         client = Client(account_sid, auth_token)
+
+        if max_words == 1:        
+            body = f"{name}, welcome to story \'{title}\'! Reply with a word once the story comes to you. You are playing with {names}"
+        else:    
+            body = f"{name}, welcome to story \'{title}\'! Reply with up to {max_words} words once the story comes to you. You are playing with {names}"
+
         for name,to_num in list(zip(names, nums))[1:]:
             message = client.messages.create(
                 to = to_num,
                 from_= twilio_num,
-                body = f"{name}, welcome to story \'{title}\'! Reply with up to {max_words} words once the story comes to you. You are playing with {names}")
+                body = body)
+
+        if max_words == 1:
+            body = f"{names[0]}, welcome to story \'{title}\'! Reply with a word to begin the story."
+        else:
+            body = f"{names[0]}, welcome to story \'{title}\'! Reply with up to {max_words} words to begin the story."
+
         message = client.messages.create(
             to = nums[0],
             from_= twilio_num,

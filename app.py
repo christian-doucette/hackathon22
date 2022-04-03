@@ -36,7 +36,20 @@ def incoming_sms():
     body = request.values.get('Body', None)
     from_num = request.form.get('From', None)
 
-    #todo: read database to get to_num instead of always sending to jake
+    # scans database to get the row for the game involving this number
+    with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
+        games_table = db_client.test.games
+        game_info = None 
+
+        rows = games.find({})
+        for row in rows:
+            if from_num in row["nums"]:
+                game_info = row 
+                break
+
+
+
+
     to_num = "+19172266242"
     twilio_num = "+17579199437"
 
@@ -46,14 +59,31 @@ def incoming_sms():
     account_sid = os.getenv('TWILIO_SID')
     auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
     client = Client(account_sid, auth_token)
-    body = request.values.get('Body', None)
 
-    message = client.messages.create(
-	    to = to_num, 
-	    from_= twilio_num,
-	    body = body)
 
-    return message.sid
+    if game_info is None:
+        message = client.messages.create(
+            to = to_num, 
+            from_= twilio_num,
+            body = "You're not currently in a Story. Please contact Jake Apfel. Please.")
+        return message.sid
+
+    else:
+        game_info["message"] = game_info["message"] + " " + body.split()[0]
+        game_info["index_in_nums"] = (game_info["index_in_nums"] + 1) % len(game_info["nums"])
+
+        message = client.messages.create(
+            to = to_num, 
+            from_= twilio_num,
+            body = game_info["message"])
+
+        with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
+            games_table = db_client.test.games
+            games_table.update_one({"_id": game_info["_id"]}, {"$set": game_info})
+            
+        return message.sid
+
+
 
 
 @app.route("/create-group", methods=["POST"])
@@ -63,11 +93,13 @@ def create_group():
     num_players = request.form['num_players']
     names = request.form.getlist('names')
     nums = request.form.getlist('nums')
+    # adds +1 to start of phone number and removes dashes
+    nums = [f'+1{num.replace("-", "")}' for num in nums]
 
 
     # connects to MongoDB Atlas instance, inserts this game, then closes connection
-    with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as client:
-        games_table = client.test.games
+    with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
+        games_table = db_client.test.games
         new_game = {"title": title, "message": "", "names": names, "nums": nums, "index_in_nums": 0}
 
         twilio_num = "+17579199437"

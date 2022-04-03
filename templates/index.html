@@ -7,12 +7,12 @@
     <script>
         function formatPhone(value){
             value = value.replaceAll("-","");
-  
-            if(value.length > 3 && value.length <= 6) 
+
+            if(value.length > 3 && value.length <= 6)
                 value = value.slice(0,3) + "-" + value.slice(3);
-            else if(value.length > 6) 
+            else if(value.length > 6)
                 value = value.slice(0,3) + "-" + value.slice(3,6) + "-" + value.slice(6);
-            
+
             return value;
         }
 
@@ -71,7 +71,7 @@
             form.append(submit)
         }
 
-        
+
     </script>
 </head>
 <body class="bg-dark text-center text-white">
@@ -83,7 +83,7 @@
                     <a class="nav-link active" aria-current="page" href="/">Create</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="/rules">Rules</a>
+                    <a class="nav-link" href="/about_us">About Us</a>
                   </li>
                 </ul>
         </nav>

@@ -65,7 +65,7 @@ def incoming_sms():
             to = from_num, 
             from_= twilio_num,
             body = "You're not currently in a Story. Please contact Jake Apfel. Please.")
-        return 400
+        return "400"
 
     cur_num = game_info["nums"][game_info["index_in_nums"]]
     if cur_num != from_num:
@@ -73,7 +73,7 @@ def incoming_sms():
             to = from_num, 
             from_= twilio_num,
             body = "It's not your turn!")
-        return 400
+        return "400"
 
     if body == "END":
         #game is ending. text everyone full story and remove database entry
@@ -88,7 +88,7 @@ def incoming_sms():
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games
             games_table.delete_one({"_id": game_info["_id"]})
-        return 200
+        return "200"
 
     else:
         #recieved a non command message. add to the story if it is this players turn
@@ -105,7 +105,7 @@ def incoming_sms():
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games
             games_table.update_one({"_id": game_info["_id"]}, {"$set": game_info})
-        return 200
+        return "200"
 
 
 

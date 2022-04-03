@@ -65,7 +65,7 @@ def incoming_sms():
             to = from_num, 
             from_= twilio_num,
             body = "You're not currently in a Story. Please contact Jake Apfel. Please.")
-        return message.sid
+        return 400
 
     elif body == "\end":
         #game is ending. text everyone full story and remove database entry
@@ -80,6 +80,7 @@ def incoming_sms():
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games
             games_table.delete_one({"_id": game_info["_id"]})
+        return 200
 
 
     else:
@@ -97,7 +98,7 @@ def incoming_sms():
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games
             games_table.update_one({"_id": game_info["_id"]}, {"$set": game_info})
-        return message.sid
+        return 200
 
 
 

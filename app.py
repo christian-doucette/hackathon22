@@ -67,7 +67,7 @@ def incoming_sms():
             body = "You're not currently in a Story. Please contact Jake Apfel. Please.")
         return 400
 
-    elif body == "\end":
+    elif body == "END":
         #game is ending. text everyone full story and remove database entry
 
         #todo: check if is players turn. can only end if is their turn

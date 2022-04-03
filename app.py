@@ -67,7 +67,15 @@ def incoming_sms():
             body = "You're not currently in a Story. Please contact Jake Apfel. Please.")
         return 400
 
-    elif body == "END":
+    cur_num = game_info["nums"][game_info["index_in_nums"]]
+    if cur_num != from_num:
+        message = client.messages.create(
+            to = from_num, 
+            from_= twilio_num,
+            body = "It's not your turn!")
+        return 400
+
+    if body == "END":
         #game is ending. text everyone full story and remove database entry
 
         #todo: check if is players turn. can only end if is their turn
@@ -81,7 +89,6 @@ def incoming_sms():
             games_table = db_client.test.games
             games_table.delete_one({"_id": game_info["_id"]})
         return 200
-
 
     else:
         #recieved a non command message. add to the story if it is this players turn

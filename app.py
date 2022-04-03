@@ -55,7 +55,7 @@ def incoming_sms():
             body = "It's not your turn! Wait for the story to come to you.")
         return "400"
 
-    if body.lower() == "/end" or body.lower() == "\end":
+    if body == "*":
         #pick sign off
         sign_off = random.choice(["Are movie rights available for that?", "What a fun story...", "I could write a better story. And I'm not even real.", "HAHAHAHA", "That made me smile.", "That made me tear up.", "Thanks for playing :)", "Better luck next time."])
         length = len(game_info["message"])
@@ -84,7 +84,7 @@ def incoming_sms():
         message = client.messages.create(
             to = game_info["nums"][game_info["index_in_nums"]], 
             from_= twilio_num,
-            body = f"The current story \'{game_info['title']}\' is:\n\n" + game_info["message"] + "\n\nReply with a word to continue it or \'/end\' to end it.")
+            body = f"The current story \'{game_info['title']}\' is:\n\n" + game_info["message"] + "\n\nReply with a word to continue the story or \'*\' to end it.")
 
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games

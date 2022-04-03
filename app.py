@@ -112,7 +112,7 @@ def create_group():
         account_sid = os.getenv('TWILIO_SID')
         auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
         client = Client(account_sid, auth_token)
-        for name,to_num in zip(names, nums)[1:]:
+        for name,to_num in list(zip(names, nums))[1:]:
             message = client.messages.create(
                 to = to_num, 
                 from_= twilio_num,

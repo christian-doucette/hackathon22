@@ -19,10 +19,6 @@ account_sid = os.getenv('TWILIO_SID')
 auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
 client = Client(account_sid, auth_token)
 from_num = "+17579199437"
-<<<<<<< HEAD
-
-=======
->>>>>>> production
 to_nums = ["+19172266242"]
 story = "\nStory time! Reply with a word to continue the story:\n"
 """
@@ -31,31 +27,13 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def hello():
-<<<<<<< HEAD
-    to_num = random.choice(to_nums)
-    story = client.messages.create(
-        to = to_num, 
-        from_= from_num,
-        body = story)
-    return 'Welcome to Story Time!'
-=======
     return render_template('index.html')
->>>>>>> production
 
 
 @app.route("/sms", methods=['POST'])
 def incoming_sms():
     """Send a dynamic reply to an incoming text message"""
-    body = request.values.get('Body', None)
-<<<<<<< HEAD
-    story += body.split()[0] + " "
-    to_num = random.choice(to_nums)
-    message = client.messages.create(
-	    to = to_num, 
-	    from_= from_num,
-	    body = story)
-    return to_num, story
-=======
+    body = request.values.get('Body', None).split()[0]
     from_num = request.form.get('From', None)
 
     # scans database to get the row for the game involving this number
@@ -89,8 +67,26 @@ def incoming_sms():
             body = "You're not currently in a Story. Please contact Jake Apfel. Please.")
         return message.sid
 
+    elif body == "\end":
+        #game is ending. text everyone full story and remove database entry
+
+        #todo: check if is players turn. can only end if is their turn
+        for to_num in game_info["nums"]:
+            message = client.messages.create(
+                to = to_num, 
+                from_= twilio_num,
+                body = game_info["message"])
+
+        with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
+            games_table = db_client.test.games
+            games_table.delete_one({"_id": game_info["_id"]})
+
+
     else:
-        game_info["message"] = game_info["message"] + " " + body.split()[0]
+        #recieved a non command message. add to the story if it is this players turn
+
+         #todo: check if is players turn. can only add message if is players
+        game_info["message"] = game_info["message"] + " " + body
         game_info["index_in_nums"] = (game_info["index_in_nums"] + 1) % len(game_info["nums"])
 
         message = client.messages.create(
@@ -137,7 +133,6 @@ def create_group():
     # returns confirmation message
     return f"Game created successfully!"
 
->>>>>>> production
 
 if __name__ == "__main__":
     app.run(debug=True)

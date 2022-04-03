@@ -18,13 +18,18 @@ auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
 client = Client(account_sid, auth_token)
 from_num = "+17579199437"
 
-to_nums = ["+19737229359"]
+to_nums = ["+19172266242"]
 story = "\nStory time! Reply with a word to continue the story:\n"
 
 app = Flask(__name__)
 
 @app.route('/')
 def hello():
+    to_num = random.choice(to_nums)
+    story = client.messages.create(
+        to = to_num, 
+        from_= from_num,
+        body = story)
     return 'Welcome to Story Time!'
 
 @app.route("/sms", methods=['GET', 'POST'])
@@ -34,9 +39,9 @@ def incoming_sms():
     body = request.values.get('Body', None)
     story += body.split()[0] + " "
     to_num = random.choice(to_nums)
-    story = client.messages.create(
+    message = client.messages.create(
 	    to = to_num, 
-	    from_= "+17579199437",
+	    from_= from_num,
 	    body = story)
     return to_num, story
 

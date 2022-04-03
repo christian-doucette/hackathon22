@@ -104,7 +104,7 @@ def create_group():
     # gets data from form
     title = request.form['title']
     num_players = request.form['num_players']
-    max_words = request.form['max_words']
+    max_words = int(request.form['max_words'])
     names = request.form.getlist('names')
     nums = request.form.getlist('nums')
     # adds +1 to start of phone number and removes dashes

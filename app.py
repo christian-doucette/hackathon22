@@ -11,9 +11,10 @@ from twilio.rest import Client
 from flask import Flask, request, redirect
 # from twilio.twiml.messaging_response import MessagingResponse
 import random
+import os
 
-account_sid = "ACc0bb41c45abdc570fb0d70cc670085bf"
-auth_token  = "2cd3f31b24588565f367671f415487bd"
+account_sid = os.getenv('TWILIO_SID')
+auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
 from_num = "+17579199437"
 
 to_nums = ["+19737229359"]
@@ -26,7 +27,7 @@ def incoming_sms():
     """Send a dynamic reply to an incoming text message"""
     # Get the message the user sent our Twilio number
     body = request.values.get('Body', None)
-    story += body.split()[0]
+    story += body.split()[0] + " "
     to_num = random.choice(to_nums)
     story = client.messages.create(
 	    to = to_num, 

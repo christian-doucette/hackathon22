@@ -28,6 +28,7 @@ app = Flask(__name__)
 def hello():
     to_num = "+19172266242"
     from_num = "+17579199437"
+    client = Client(account_sid, auth_token)
     client.messages.create(
         to = to_num, 
         from_= from_num,

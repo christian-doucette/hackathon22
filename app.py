@@ -2,7 +2,7 @@ from twilio.rest import Client
 from flask import Flask, request, redirect, render_template
 import random
 import os
-import pymongoss
+import pymongo
 
 
 app = Flask(__name__)
@@ -69,8 +69,7 @@ def incoming_sms():
             message = client.messages.create(
                 to = to_num, 
                 from_= twilio_num,
-                body = f"Your completed Story \"{game_info["title"]}\" is:\n\n" + game_info["message"] + "\n\n" + sign_off
-            )
+                body = f"Your completed Story \"{game_info['title']}\" is:\n\n" + game_info["message"] + "\n\n" + sign_off)
 
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games
@@ -85,7 +84,7 @@ def incoming_sms():
         message = client.messages.create(
             to = game_info["nums"][game_info["index_in_nums"]], 
             from_= twilio_num,
-            body = f"The current Story \"{game_info["title"]}\" is:\n\n" + game_info["message"] + "\n\nReply with a word to continue it, or \"/end\" to end it.")
+            body = f"The current Story \"{game_info['title']}\" is:\n\n" + game_info["message"] + "\n\nReply with a word to continue it, or \"/end\" to end it.")
 
         with pymongo.MongoClient(os.getenv("DB_CLIENT_STRING")) as db_client:
             games_table = db_client.test.games

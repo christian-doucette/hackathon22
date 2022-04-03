@@ -103,6 +103,15 @@ def incoming_sms():
             games_table.update_one({"_id": game_info["_id"]}, {"$set": game_info})
         return "200"
 
+def name_list_to_string(names):
+    if len(names) == 1:
+        return names[0]
+    else:
+        res = ', '.join(names[:-1])
+        res += ' and '
+        res += names[-1]
+        return res
+
 
 @app.route("/create-group", methods=["POST"])
 def create_group():
@@ -133,9 +142,9 @@ def create_group():
         client = Client(account_sid, auth_token)
 
         if max_words == 1:        
-            body = f"{name}, welcome to story \'{title}\'! Reply with a word once the story comes to you. You are playing with {names}"
+            body = f"{name}, welcome to story \'{title}\'! The authors are {name_list_to_string(names)}. Reply with a word once the story comes to you."
         else:    
-            body = f"{name}, welcome to story \'{title}\'! Reply with up to {max_words} words once the story comes to you. You are playing with {names}"
+            body = f"{name}, welcome to story \'{title}\'! The authors are {name_list_to_string(names)}. Reply with up to {max_words} words once the story comes to you."
 
         for name,to_num in list(zip(names, nums))[1:]:
             message = client.messages.create(
@@ -144,9 +153,9 @@ def create_group():
                 body = body)
 
         if max_words == 1:
-            body = f"{names[0]}, welcome to story \'{title}\'! Reply with a word to begin the story."
+            body = f"{names[0]}, welcome to story \'{title}\'! The authors are {name_list_to_string(names)}. Reply with a word to begin the story."
         else:
-            body = f"{names[0]}, welcome to story \'{title}\'! Reply with up to {max_words} words to begin the story."
+            body = f"{names[0]}, welcome to story \'{title}\'! The authors are {name_list_to_string(names)}. Reply with up to {max_words} words to begin the story."
 
         message = client.messages.create(
             to = nums[0],
